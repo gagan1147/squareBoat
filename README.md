@@ -27,4 +27,8 @@
     Backend:Python (Django)
 
     Frontend: Javascript(ES6)
-
+    
+    User:
+    
+    User - admin
+    password - admin
