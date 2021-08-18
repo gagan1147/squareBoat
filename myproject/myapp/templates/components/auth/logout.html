@@ -1,0 +1,14 @@
+{% extends 'components/auth/main.html' %}
+
+{% block content %}
+
+
+    <form method="POST">
+        {% csrf_token %}
+        {{form.as_p}}
+        <h3>Are your sure, you want to Logout ?</h3>
+        <button class="button" type="submit" value="login">Logout</button>
+    </form>
+    <a class="btn btn-danger my-3" href="{% url 'home' %}">Go Back</a>
+
+{% endblock content %}

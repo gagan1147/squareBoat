@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<div class = 'row text-center' >
+    <div class = 'col'>
+ 
+        {% if request.user.is_authenticated  %}
+            <h3>Hello {{request.user|title}}</h3>
+            
+        {% else %}
+            <h3>Please Login First!!</h3>
+            
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-4 mx-auto col-10">
+        <form class ="form" action="{% url 'tweet_create' %}" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="/" />
+            <textarea name="content" class = "form-control" placeholder="Your Tweeting" required></textarea>
+            <button type="submit" class = "btn btn-primary">TWEET</button>
+        </form>
+    </div>
+</div>
+
+
+
+<div class="container">
+    <div class="row">
+      <div class="col-sm">
+        <h2>My Tweets</h2>
+        <div class='row' id="tweets">
+            
+            <h4>No Tweets</h4>
+        </div>
+      </div>
+      <div class="col-sm">
+        <h2>Follower Tweets</h2>
+        <div class='row' id="followerTweets">
+            <h4>No Tweets</h4>
+        </div>
+      </div>
+      <div class="col-sm">
+        <h2>User Available to follow</h2>
+        <div>
+            <ul>
+                {% for user in allUsers %}
+              
+                <li>
+                    {{user}} 
+
+                    <a type="button" id = {{user}} class="btn btn-primary mb-2 btn-sm" onclick=myfunction(id) >Follow</a>
+                </li>
+                
+                {% endfor %}
+            </ul>
+            <h2>following</h2>
+            <ul>
+                {% for user in allFollower %}
+              
+                <li>
+                    {{user}} 
+
+                    <!-- <a type="button" id = {{user}} class="btn btn-primary mb-2 btn-sm" onclick=myfunction(id) >Follow</a> -->
+                </li>
+                
+                {% endfor %}
+            </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+    let myfunction = (user) => {
+        const xhr = new XMLHttpRequest();
+        const method = 'GET';
+        const url = "/follow_button/"+user;
+        xhr.open(method,url);
+        xhr.send();
+        alert(url);
+    }
+    const xhr = new XMLHttpRequest();
+    const xhr2 = new XMLHttpRequest();
+    const method = 'GET';
+    const url = "/tweets";
+    const follow_url = '/follow';
+    const follow_responseType = "json";
+    const responseType = "json";
+    let tweetsElement = document.getElementById("tweets");
+    let followerTweetsElemnt = document.getElementById("followerTweets");
+    xhr2.responseType = follow_responseType;
+    xhr.responseType = responseType;
+    let handleDidLike = (tweet_id,currentCount) => {
+        console.log(tweet_id,currentCount);
+        currentCount++;
+        return
+    };
+    let likeButton = (tweet) => {
+        let temp = "<button class = 'btn btn-primary btn-sm' onclick = handleDidLike(" + tweet.id + "," + tweet.likes +")>" + tweet.likes + " Likes</button>"; 
+        return temp;
+    };
+    let formattedTweets = (tweets) =>{
+        let newUpdatedTweets = "<div class='mb-4 col-12 py-3 tweet' id='tweet-" + tweets.id +"' p>" + tweets.content + "</p><div class='btn-group'>" + likeButton(tweets) + "</div></div>";
+
+        return newUpdatedTweets;
+    };
+
+    xhr.open(method,url);
+    xhr2.open(method,follow_url);
+    xhr.onload =()=> {
+        const serverResponse =  xhr.response;
+        let listedItems = serverResponse.response;
+        let finalTweets = "";
+        let i;
+        for(i=0;i<listedItems.length;i++){
+            let tweetObj = listedItems[i];
+            finalTweets += formattedTweets(tweetObj);
+        }
+        tweetsElement.innerHTML = finalTweets;
+    }
+    xhr.send();
+    xhr2.onload = () =>{
+        const serverResponse =  xhr2.response;
+        let listedItems = serverResponse.response;
+        let finalTweets = "";
+        let i;
+        for(i=0;i<listedItems.length;i++){
+            let tweetObj = listedItems[i];
+            finalTweets += formattedTweets(tweetObj);
+        }
+        followerTweetsElemnt.innerHTML = finalTweets;
+    }
+    xhr2.send();
+</script>
+
+
+{% endblock content %}

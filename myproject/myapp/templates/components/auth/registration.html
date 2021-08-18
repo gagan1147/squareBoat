@@ -1,0 +1,12 @@
+{% extends 'components/auth/main.html' %}
+{% block content %}
+<h1>User Registrations</h1>
+
+<form method="POST" action="">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button class="button" value="login">SignUP</button>
+</form>
+<p>Already have an account <a class="btn btn-dark my-3" href="{% url 'login' %}">Login</a></p>
+
+{% endblock content %}
